@@ -30,6 +30,9 @@ const users: User[] = [
 ]
 
 //一覧取得
+app.get('/', (req: express.Request, res: express.Response) => {
+  res.send('helthy')
+})
 app.get('/users', (req: express.Request, res: express.Response) => {
   res.send(JSON.stringify(users))
 })
