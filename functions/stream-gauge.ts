@@ -115,6 +115,7 @@ const generateStreamGaugeData = async () => {
       藤井: '35.4930556, 134.7838889',
       伊府: '35.4555556, 134.7294444',
       竹野: '35.6530556, 134.7627778',
+      香住: '35.6291667, 134.6205556',
     }
 
     const generatedData: { [key: string]: StreamGauge.NGSI } = {}
