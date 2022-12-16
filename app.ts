@@ -23,12 +23,6 @@ app.use(
   }
 )
 
-console.log(Number(!!process.env.PORT))
-
-app.listen(Number(!!process.env.PORT) || 3000, () => {
-  console.log(`Start on port ${!!process.env.PORT}.`)
-})
-
 app.get('/', (req: express.Request, res: express.Response) => {
   res.send('helthy')
 })
@@ -99,3 +93,7 @@ app.get(
     res.send('success')
   }
 )
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Start on port ${process.env.PORT}.`)
+})
