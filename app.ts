@@ -1,9 +1,19 @@
 import express from 'express'
+import {
+  patchRainFromOpendata,
+  postRainFromOpendata,
+  subscribeRain,
+} from './functions/rain'
+import { postSnowFromJMAdata } from './functions/snow'
+import {
+  patchStreamGaugeFromOpendata,
+  postStreamGaugeFromOpendata,
+  subscribeStreamGauge,
+} from './functions/stream-gauge'
 const app: express.Express = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-//CROS対応（というか完全無防備：本番環境ではだめ絶対）
 app.use(
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
     res.header('Access-Control-Allow-Origin', '*')
@@ -13,26 +23,77 @@ app.use(
   }
 )
 
-app.listen(3000, () => {
-  console.log('Start on port 3000.')
+app.listen(Number(!!process.env.PORT) || 3000, () => {
+  console.log(`Start on port ${!!process.env.PORT}.`)
 })
 
-type User = {
-  id: number
-  name: string
-  email: string
-}
-
-const users: User[] = [
-  { id: 1, name: 'User1', email: 'user1@test.local' },
-  { id: 2, name: 'User2', email: 'user2@test.local' },
-  { id: 3, name: 'User3', email: 'user3@test.local' },
-]
-
-//一覧取得
 app.get('/', (req: express.Request, res: express.Response) => {
   res.send('helthy')
 })
-app.get('/users', (req: express.Request, res: express.Response) => {
-  res.send(JSON.stringify(users))
-})
+app.get(
+  '/post/:entity',
+  async (req: express.Request, res: express.Response) => {
+    switch (req.params.entity) {
+      case 'rain':
+        await postRainFromOpendata()
+        break
+      case 'stream-gauge':
+        await postStreamGaugeFromOpendata()
+        break
+      case 'snow':
+        await postSnowFromJMAdata()
+        break
+      case 'all':
+        await postRainFromOpendata()
+        await postStreamGaugeFromOpendata()
+        await postSnowFromJMAdata()
+        break
+      default:
+        res.send('failed')
+        return
+    }
+    res.send('success')
+  }
+)
+app.get(
+  '/patch/:entity',
+  async (req: express.Request, res: express.Response) => {
+    switch (req.params.entity) {
+      case 'rain':
+        await patchRainFromOpendata()
+        break
+      case 'stream-gauge':
+        await patchStreamGaugeFromOpendata()
+        break
+      case 'all':
+        await patchRainFromOpendata()
+        await patchStreamGaugeFromOpendata()
+        break
+      default:
+        res.send('failed')
+        return
+    }
+    res.send('success')
+  }
+)
+app.get(
+  '/subscribe/:entity',
+  async (req: express.Request, res: express.Response) => {
+    switch (req.params.entity) {
+      case 'rain':
+        await subscribeRain()
+        break
+      case 'stream-gauge':
+        await subscribeStreamGauge()
+        break
+      case 'all':
+        await subscribeRain()
+        await subscribeStreamGauge()
+        break
+      default:
+        res.send('failed')
+        return
+    }
+    res.send('success')
+  }
+)
