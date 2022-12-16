@@ -48,7 +48,7 @@ export const patchSnowFromJMAdata = async () => {
   }
 }
 
-export const subscribeRain = async () => {
+export const subscribeSnow = async () => {
   const requestToken = await getJwt()
 
   for (const area of AreaNames) {

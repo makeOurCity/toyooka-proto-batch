@@ -4,7 +4,7 @@ import {
   postRainFromOpendata,
   subscribeRain,
 } from './functions/rain'
-import { postSnowFromJMAdata } from './functions/snow'
+import { postSnowFromJMAdata, subscribeSnow } from './functions/snow'
 import {
   patchStreamGaugeFromOpendata,
   postStreamGaugeFromOpendata,
@@ -82,9 +82,12 @@ app.get(
       case 'stream-gauge':
         await subscribeStreamGauge()
         break
+      case 'snow':
+        await subscribeSnow()
       case 'all':
         await subscribeRain()
         await subscribeStreamGauge()
+        await subscribeSnow()
         break
       default:
         res.send('failed')
