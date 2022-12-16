@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ORION_URL, SUBSCRIPTION_URL } from '../config/env-ver'
+import { ORION_URL, SUBSCRIPTION_URL } from '../config/env-var'
 import { AreaNameEN, AreaNames } from '../constant/area'
 import { Rain } from '../types/rain'
 import { getJwt } from '../utils/auth'
@@ -18,7 +18,7 @@ export const postRainFromOpendata = async () => {
       await axios.post(`${ORION_URL()}/v2/entities`, postData, {
         headers: {
           Authorization: requestToken,
-          'Fiware-Service': 'toyooka_test_2022',
+          'Fiware-Service': 'toyooka_2022',
           'Fiware-ServicePath': '/',
         },
       })
@@ -40,7 +40,7 @@ export const patchRainFromOpendata = async () => {
         {
           headers: {
             Authorization: requestToken,
-            'Fiware-Service': 'toyooka_test_2022',
+            'Fiware-Service': 'toyooka_sandbox',
             'Fiware-ServicePath': '/',
           },
         }
@@ -84,7 +84,7 @@ export const subscribeRain = async () => {
       {
         headers: {
           Authorization: requestToken,
-          'Fiware-Service': 'toyooka_test_2022',
+          'Fiware-Service': 'toyooka_sandbox',
         },
       }
     )

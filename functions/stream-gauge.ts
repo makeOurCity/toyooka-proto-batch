@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ORION_URL, SUBSCRIPTION_URL } from '../config/env-ver'
+import { ORION_URL, SUBSCRIPTION_URL } from '../config/env-var'
 import { AreaNameEN, AreaNames } from '../constant/area'
 import { StreamGauge } from '../types/stream-gauge'
 import { getJwt } from '../utils/auth'
@@ -16,7 +16,11 @@ export const postStreamGaugeFromOpendata = async () => {
         id: orionId,
       }
       await axios.post(`${ORION_URL()}/v2/entities`, postData, {
-        headers: { Authorization: requestToken },
+        headers: {
+          Authorization: requestToken,
+          'Fiware-Service': 'toyooka_2022',
+          'Fiware-ServicePath': '/',
+        },
       })
     }
   } catch (error) {
@@ -33,7 +37,13 @@ export const patchStreamGaugeFromOpendata = async () => {
       await axios.put(
         `${ORION_URL()}/v2/entities/${orionId}/attrs`,
         data[orionId],
-        { headers: { Authorization: requestToken } }
+        {
+          headers: {
+            Authorization: requestToken,
+            'Fiware-Service': 'toyooka_sandbox',
+            'Fiware-ServicePath': '/',
+          },
+        }
       )
     }
   } catch (error) {
@@ -75,7 +85,12 @@ export const subscribeStreamGauge = async () => {
         expires: '2040-01-01T14:00:00.00Z',
         throttling: 5,
       },
-      { headers: { Authorization: requestToken } }
+      {
+        headers: {
+          Authorization: requestToken,
+          'Fiware-Service': 'toyooka_sandbox',
+        },
+      }
     )
   }
 }

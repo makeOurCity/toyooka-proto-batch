@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { parse } from 'papaparse'
-import { ORION_URL, SUBSCRIPTION_URL } from '../config/env-ver'
+import { ORION_URL, SUBSCRIPTION_URL } from '../config/env-var'
 import { AreaNameEN, AreaNames } from '../constant/area'
 import { Snow } from '../types/snow'
 import { getJwt } from '../utils/auth'
@@ -13,7 +13,11 @@ export const postSnowFromJMAdata = async () => {
     for (const orionId of Object.keys(data)) {
       const postData = { ...data[orionId], type: 'toyooka-snow', id: orionId }
       await axios.post(`${ORION_URL()}/v2/entities`, postData, {
-        headers: { Authorization: requestToken },
+        headers: {
+          Authorization: requestToken,
+          'Fiware-Service': 'toyooka_sandbox',
+          'Fiware-ServicePath': '/',
+        },
       })
     }
   } catch (error) {
@@ -30,7 +34,13 @@ export const patchSnowFromJMAdata = async () => {
       await axios.put(
         `${ORION_URL()}/v2/entities/${orionId}/attrs`,
         data[orionId],
-        { headers: { Authorization: requestToken } }
+        {
+          headers: {
+            Authorization: requestToken,
+            'Fiware-Service': 'toyooka_sandbox',
+            'Fiware-ServicePath': '/',
+          },
+        }
       )
     }
   } catch (error) {
@@ -76,7 +86,12 @@ export const subscribeRain = async () => {
         expires: '2040-01-01T14:00:00.00Z',
         throttling: 5,
       },
-      { headers: { Authorization: requestToken } }
+      {
+        headers: {
+          Authorization: requestToken,
+          'Fiware-Service': 'toyooka_sandbox',
+        },
+      }
     )
   }
 }
