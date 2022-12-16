@@ -1,27 +1,32 @@
-export const AreaNames = [
-  '野垣',
+export const RainAreaNames = [
   '豊岡',
   '八鹿',
   '竹野',
   '大屋',
   '関宮',
   '伊府',
-  '辻',
   '出石',
-  '赤崎',
-  '府市場',
   '城崎',
-  '円山川藪崎',
-  '駄坂',
-  '弘原',
-  '矢根',
-  '大坪',
-  '藤井',
-  '宮井',
-  '兎和野高原',
   '和田山',
   '香住',
 ]
+
+export const StreamGaugeAreaNames = [
+  '円山川藪崎',
+  '野垣',
+  '駄坂',
+  '矢根',
+  '八鹿',
+  '関宮',
+  '大屋',
+  '大坪',
+  '藤井',
+  '伊府',
+  '竹野',
+  '香住',
+]
+
+export const SnowAreaNames = ['豊岡', '香住', '和田山', '兎和野高原']
 
 export const AreaNameEN: { [key: string]: string } = {
   野垣: 'nogaki',

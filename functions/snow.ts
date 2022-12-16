@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { parse } from 'papaparse'
 import { ORION_URL, SUBSCRIPTION_URL } from '../config/env-var'
-import { AreaNameEN, AreaNames } from '../constant/area'
+import { AreaNameEN, SnowAreaNames } from '../constant/area'
 import { Snow } from '../types/snow'
 import { getJwt } from '../utils/auth'
 
@@ -51,7 +51,7 @@ export const patchSnowFromJMAdata = async () => {
 export const subscribeSnow = async () => {
   const requestToken = await getJwt()
 
-  for (const area of AreaNames) {
+  for (const area of SnowAreaNames) {
     const enName = AreaNameEN[area]
     await axios.post(
       `${ORION_URL()}/v2/subscriptions`,
@@ -128,7 +128,7 @@ const generateSnowData = async () => {
     }
 
     const generatedData: { [key: string]: Snow.NGSI } = {}
-    for (const area of AreaNames) {
+    for (const area of SnowAreaNames) {
       const enName = AreaNameEN[area]
       const coverRecord = coverdata.find(
         (cd) => cd.都道府県 === '兵庫県' && cd.地点.includes(area)

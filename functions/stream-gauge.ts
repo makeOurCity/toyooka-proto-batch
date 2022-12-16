@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { ORION_URL, SUBSCRIPTION_URL } from '../config/env-var'
-import { AreaNameEN, AreaNames } from '../constant/area'
+import { AreaNameEN, StreamGaugeAreaNames } from '../constant/area'
 import { StreamGauge } from '../types/stream-gauge'
 import { getJwt } from '../utils/auth'
 
@@ -54,7 +54,7 @@ export const patchStreamGaugeFromOpendata = async () => {
 export const subscribeStreamGauge = async () => {
   const requestToken = await getJwt()
 
-  for (const area of AreaNames) {
+  for (const area of StreamGaugeAreaNames) {
     const enName = AreaNameEN[area]
     await axios.post(
       `${ORION_URL()}/v2/subscriptions`,
@@ -119,7 +119,7 @@ const generateStreamGaugeData = async () => {
     }
 
     const generatedData: { [key: string]: StreamGauge.NGSI } = {}
-    for (const area of AreaNames) {
+    for (const area of StreamGaugeAreaNames) {
       const enName = AreaNameEN[area]
       const record = records.find((r) => r.観測所名 === area)
       if (record && enName) {

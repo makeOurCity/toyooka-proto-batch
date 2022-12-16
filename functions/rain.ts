@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { ORION_URL, SUBSCRIPTION_URL } from '../config/env-var'
-import { AreaNameEN, AreaNames } from '../constant/area'
+import { AreaNameEN, RainAreaNames } from '../constant/area'
 import { Rain } from '../types/rain'
 import { getJwt } from '../utils/auth'
 
@@ -54,7 +54,7 @@ export const patchRainFromOpendata = async () => {
 export const subscribeRain = async () => {
   const requestToken = await getJwt()
 
-  for (const area of AreaNames) {
+  for (const area of RainAreaNames) {
     const enName = AreaNameEN[area]
     await axios.post(
       `${ORION_URL()}/v2/subscriptions`,
@@ -91,6 +91,24 @@ export const subscribeRain = async () => {
   }
 }
 
+export const unsubscribeRain = async () => {
+  const requestToken = await getJwt()
+  const { data: rainSubscriptions } = await axios.get(
+    `${ORION_URL()}/v2/subscriptions/?limit=100`,
+    { headers: { 'Fiware-Service': 'toyooka_sandbox' } }
+  )
+  for (const subscription of rainSubscriptions) {
+    await axios.delete(`${ORION_URL()}/v2/subscriptions/${subscription.id}`, {
+      headers: {
+        Authorization: requestToken,
+        'Fiware-Service': 'toyooka_sandbox',
+      },
+    })
+  }
+  console.log(rainSubscriptions.length)
+  return
+}
+
 const generateRainData = async () => {
   try {
     const rowDataUrl =
@@ -113,7 +131,7 @@ const generateRainData = async () => {
     }
 
     const generatedData: { [key: string]: Rain.NGSI } = {}
-    for (const area of AreaNames) {
+    for (const area of RainAreaNames) {
       const enName = AreaNameEN[area]
       const record = records.find((r) => r.観測所名 === area)
       if (record && enName) {
