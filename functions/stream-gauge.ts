@@ -18,7 +18,7 @@ export const postStreamGaugeFromOpendata = async () => {
       await axios.post(`${ORION_URL()}/v2/entities`, postData, {
         headers: {
           Authorization: requestToken,
-          'Fiware-Service': 'toyooka_2022',
+          'Fiware-Service': 'toyooka_sandbox',
           'Fiware-ServicePath': '/',
         },
       })
