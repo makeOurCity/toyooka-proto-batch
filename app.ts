@@ -15,6 +15,8 @@ import {
   postStreamGaugeFromOpendata,
   subscribeStreamGauge,
 } from './functions/stream-gauge'
+import { postRoadRestrictionFromKintone } from './functions/road-restriction'
+import { patchMobarokeData, postMobarokeData } from './functions/mobaroke'
 const app: express.Express = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -45,6 +47,13 @@ app.get(
         case 'snow':
           await postSnowFromJMAdata()
           break
+        case 'tracking-device':
+          await postMobarokeData()
+          break
+        case 'road-restriction':
+          const data = await postRoadRestrictionFromKintone()
+          res.send(data)
+          return
         case 'all':
           await postRainFromOpendata()
           await postStreamGaugeFromOpendata()
@@ -74,10 +83,15 @@ app.get(
           break
         case 'snow':
           await patchSnowFromJMAdata()
+          break
+        case 'tracking-device':
+          await patchMobarokeData()
+          break
         case 'all':
           await patchRainFromOpendata()
           await patchStreamGaugeFromOpendata()
           await patchSnowFromJMAdata()
+          // await patchMobarokeData()
           break
         default:
           res.send('failed')
@@ -148,6 +162,11 @@ app.get(
     }
   }
 )
+
+app.post('/notify', async (req: express.Request, res: express.Response) => {
+  console.log(req.body)
+  res.send('success')
+})
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Start on port ${process.env.PORT}.`)
