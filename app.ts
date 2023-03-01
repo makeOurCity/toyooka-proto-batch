@@ -17,6 +17,7 @@ import {
 } from './functions/stream-gauge'
 import { postRoadRestrictionFromKintone } from './functions/road-restriction'
 import { patchMobarokeData, postMobarokeData } from './functions/mobaroke'
+import schedule from 'node-schedule'
 const app: express.Express = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -51,9 +52,8 @@ app.get(
           await postMobarokeData()
           break
         case 'road-restriction':
-          const data = await postRoadRestrictionFromKintone()
-          res.send(data)
-          return
+          await postRoadRestrictionFromKintone()
+          break
         case 'all':
           await postRainFromOpendata()
           await postStreamGaugeFromOpendata()
@@ -166,6 +166,11 @@ app.get(
 app.post('/notify', async (req: express.Request, res: express.Response) => {
   console.log(req.body)
   res.send('success')
+})
+
+schedule.scheduleJob('0,10,20,30,40,50 * * * * *', () => {
+  patchMobarokeData()
+  postRoadRestrictionFromKintone()
 })
 
 app.listen(process.env.PORT || 3000, () => {

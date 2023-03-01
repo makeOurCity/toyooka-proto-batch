@@ -197,10 +197,10 @@ export namespace RoadRestriction {
     restrictedSection: { value: string; type?: string }
     restrictReason: { value: string; type?: string }
     description: { value: string; type?: string }
-    restrictStartDate: { value: Date | null; type?: string }
-    restrictEndDate: { value: Date | null; type?: string }
+    restrictStartDate: { value: string | null; type?: string }
+    restrictEndDate: { value: string | null; type?: string }
     note: { value: string; type?: string }
     images: { value: string[]; type?: string }
-    isRestricting: { value: boolean }
+    status: { value: string }
   }
 }
