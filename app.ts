@@ -18,6 +18,7 @@ import {
 import { postRoadRestrictionFromKintone } from './functions/road-restriction'
 import { patchMobarokeData, postMobarokeData } from './functions/mobaroke'
 import schedule from 'node-schedule'
+import { patchUnderPath, postUnderPath } from './functions/underpath'
 const app: express.Express = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -53,6 +54,9 @@ app.get(
           break
         case 'road-restriction':
           await postRoadRestrictionFromKintone()
+          break
+        case 'underpath':
+          await postUnderPath()
           break
         case 'all':
           await postRainFromOpendata()
@@ -171,6 +175,10 @@ app.post('/notify', async (req: express.Request, res: express.Response) => {
 schedule.scheduleJob('0,10,20,30,40,50 * * * * *', () => {
   patchMobarokeData()
   postRoadRestrictionFromKintone()
+})
+
+schedule.scheduleJob('0 * * * * *', () => {
+  patchUnderPath()
 })
 
 app.listen(process.env.PORT || 3000, () => {
