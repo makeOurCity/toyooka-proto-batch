@@ -95,7 +95,6 @@ app.get(
           await patchRainFromOpendata()
           await patchStreamGaugeFromOpendata()
           await patchSnowFromJMAdata()
-          await patchMobarokeData()
           break
         default:
           res.send('failed')
