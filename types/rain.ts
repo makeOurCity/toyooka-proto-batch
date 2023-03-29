@@ -18,10 +18,13 @@ export namespace Rain {
 
   export type NGSI = {
     name: { value: string }
-    location: { value: string }
+    location: {
+      value: { type: 'Point'; coordinates: number[] }
+      type: 'geo:json'
+    }
     precipitation_10m: { value: number }
     precipitation_1h: { value: number }
     precipitation_24h: { value: number }
-    dateObserved: { value: Date }
+    dateObserved: { value: Date; type: 'Date' }
   }
 }

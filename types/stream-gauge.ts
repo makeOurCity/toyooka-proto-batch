@@ -14,7 +14,10 @@ export namespace StreamGauge {
 
   export type NGSI = {
     name: { value: string }
-    location: { value: string }
+    location: {
+      value: { type: 'Point'; coordinates: number[] }
+      type: 'geo:json'
+    }
     waterLevel: { value: number }
     waterLevelIncrease_10m: { value: number }
     waterLevelIncrease_1h: { value: number }

@@ -9,19 +9,27 @@ export const postRainFromOpendata = async () => {
     const data = await generateRainData()
     if (!data) return
     const requestToken = await getJwt()
-    for (const orionId of Object.keys(data)) {
-      const postData = {
-        ...data[orionId],
-        type: 'toyooka-rain',
-        id: orionId,
+
+    const areas = Object.keys(data)
+
+    for (let index = 0; index < areas.length; index++) {
+      try {
+        const orionId = areas[index]
+        const postData = {
+          ...data[orionId],
+          type: 'toyooka-rain-handson',
+          id: orionId,
+        }
+        await axios.post(`${ORION_URL()}/v2/entities`, postData, {
+          headers: {
+            Authorization: requestToken,
+            'Fiware-Service': 'toyooka_sandbox',
+            'Fiware-ServicePath': '/',
+          },
+        })
+      } catch (error) {
+        continue
       }
-      await axios.post(`${ORION_URL()}/v2/entities`, postData, {
-        headers: {
-          Authorization: requestToken,
-          'Fiware-Service': 'toyooka_sandbox',
-          'Fiware-ServicePath': '/',
-        },
-      })
     }
   } catch (error) {
     console.log(error)
@@ -31,11 +39,12 @@ export const postRainFromOpendata = async () => {
 export const patchRainFromOpendata = async () => {
   try {
     const data = await generateRainData()
+
     if (!data) return
     const requestToken = await getJwt()
     for (const orionId of Object.keys(data)) {
       await axios.put(
-        `${ORION_URL()}/v2/entities/${orionId}/attrs`,
+        `${ORION_URL()}/v2/entities/${orionId}/attrs?type=toyooka-rain-handson`,
         data[orionId],
         {
           headers: {
@@ -117,17 +126,19 @@ const generateRainData = async () => {
     const records = data.result.records as Rain.Record[]
     const currentDate = new Date()
 
-    const rainLocation: { [key: string]: string } = {
-      豊岡: '35.54805556, 134.8205556',
-      八鹿: '35.39555556, 134.7566667',
-      竹野: '35.6530556, 134.7627778',
-      大屋: '35.3416667, 134.6766667',
-      関宮: '35.3744444, 134.6436111',
-      伊府: '35.4556111, 134.7300278',
-      出石: '35.4663611, 134.8701111',
-      城崎: '35.62666667, 134.8155556',
-      和田山: '35.323333, 134.848333',
-      香住: '35.6291667, 134.6205556',
+    console.log(currentDate)
+
+    const rainLocation: { [key: string]: number[] } = {
+      豊岡: [134.8205556, 35.54805556],
+      八鹿: [134.7566667, 35.39555556],
+      竹野: [134.7627778, 35.6530556],
+      大屋: [134.6766667, 35.3416667],
+      関宮: [134.6436111, 35.3744444],
+      伊府: [134.7300278, 35.4556111],
+      出石: [134.8701111, 35.4663611],
+      城崎: [134.8155556, 35.62666667],
+      和田山: [134.848333, 35.323333],
+      香住: [134.6205556, 35.6291667],
     }
 
     const generatedData: { [key: string]: Rain.NGSI } = {}
@@ -138,11 +149,14 @@ const generateRainData = async () => {
         const orionId = `toyooka-rainObserved-${enName}`
         const importData: Rain.NGSI = {
           name: { value: area },
-          location: { value: rainLocation[area] },
+          location: {
+            value: { type: 'Point', coordinates: rainLocation[area] },
+            type: 'geo:json',
+          },
           precipitation_10m: { value: record['60分雨量[mm]'] },
           precipitation_1h: { value: record['60分雨量[mm]'] },
           precipitation_24h: { value: record['24時間雨量[mm]'] },
-          dateObserved: { value: currentDate },
+          dateObserved: { value: currentDate, type: 'Date' },
         }
         generatedData[orionId] = importData
       }

@@ -10,18 +10,22 @@ export const postStreamGaugeFromOpendata = async () => {
     if (!data) return
     const requestToken = await getJwt()
     for (const orionId of Object.keys(data)) {
-      const postData = {
-        ...data[orionId],
-        type: 'toyooka-streamgauge',
-        id: orionId,
+      try {
+        const postData = {
+          ...data[orionId],
+          type: 'toyooka-streamgauge-handson',
+          id: orionId,
+        }
+        await axios.post(`${ORION_URL()}/v2/entities`, postData, {
+          headers: {
+            Authorization: requestToken,
+            'Fiware-Service': 'toyooka_sandbox',
+            'Fiware-ServicePath': '/',
+          },
+        })
+      } catch (error) {
+        continue
       }
-      await axios.post(`${ORION_URL()}/v2/entities`, postData, {
-        headers: {
-          Authorization: requestToken,
-          'Fiware-Service': 'toyooka_sandbox',
-          'Fiware-ServicePath': '/',
-        },
-      })
     }
   } catch (error) {
     console.log(error)
@@ -35,7 +39,7 @@ export const patchStreamGaugeFromOpendata = async () => {
     const requestToken = await getJwt()
     for (const orionId of Object.keys(data)) {
       await axios.put(
-        `${ORION_URL()}/v2/entities/${orionId}/attrs`,
+        `${ORION_URL()}/v2/entities/${orionId}/attrs?type=toyooka-streamgauge-handson`,
         data[orionId],
         {
           headers: {
@@ -103,19 +107,19 @@ const generateStreamGaugeData = async () => {
     const records = data.result.records as StreamGauge.Record[]
     const currentDate = new Date()
 
-    const streamGaugeLocation: { [key: string]: string } = {
-      円山川藪崎: '35.3911111, 134.7947222',
-      野垣: '35.5397222, 134.7747222',
-      駄坂: '35.5238889, 134.8427778',
-      矢根: '35.4638889, 134.9266667',
-      八鹿: '35.4061111, 134.7727778',
-      関宮: '35.3752778, 134.6461111',
-      大屋: '35.3416667, 134.6761111',
-      大坪: '35.3516667, 134.7577778',
-      藤井: '35.4930556, 134.7838889',
-      伊府: '35.4555556, 134.7294444',
-      竹野: '35.6530556, 134.7627778',
-      香住: '35.6291667, 134.6205556',
+    const streamGaugeLocation: { [key: string]: number[] } = {
+      円山川藪崎: [134.7947222, 35.3911111],
+      野垣: [134.7747222, 35.5397222],
+      駄坂: [134.8427778, 35.5238889],
+      矢根: [134.9266667, 35.4638889],
+      八鹿: [134.7727778, 35.4061111],
+      関宮: [134.6461111, 35.3752778],
+      大屋: [134.6761111, 35.3416667],
+      大坪: [134.7577778, 35.3516667],
+      藤井: [134.7838889, 35.4930556],
+      伊府: [134.7294444, 35.4555556],
+      竹野: [134.7627778, 35.6530556],
+      香住: [134.6205556, 35.6291667],
     }
 
     const generatedData: { [key: string]: StreamGauge.NGSI } = {}
@@ -126,7 +130,10 @@ const generateStreamGaugeData = async () => {
         const orionId = `toyooka-streamGaugeObserved-${enName}`
         const importData: StreamGauge.NGSI = {
           name: { value: area },
-          location: { value: streamGaugeLocation[area] },
+          location: {
+            value: { type: 'Point', coordinates: streamGaugeLocation[area] },
+            type: 'geo:json',
+          },
           waterLevel: { value: record['河川水位[m]'] },
           waterLevelIncrease_10m: {
             value: record['10分（前回）水位変化量[m]'],
